@@ -1,0 +1,157 @@
+:root {
+    --bg: #ffffff;
+    --accent: #000000;
+    --gray: #f4f4f7;
+    --text-secondary: #8e8e93;
+}
+
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: var(--bg);
+    overflow-x: hidden;
+}
+
+/* Анимация перелива ИИ */
+.ai-shimmer {
+    font-weight: 600;
+    background: linear-gradient(90deg, #000, #007aff, #ff2d55, #000);
+    background-size: 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 5s infinite linear;
+}
+
+@keyframes shimmer {
+    0% { background-position: 0%; }
+    100% { background-position: 100%; }
+}
+
+/* Плавное появление */
+.fade-in {
+    animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.logo { font-size: 24px; letter-spacing: 3px; }
+
+/* Поиск */
+.search-wrapper {
+    margin: 40px auto;
+    width: 90%;
+    max-width: 600px;
+    display: flex;
+    background: var(--gray);
+    border-radius: 50px;
+    padding: 10px 20px;
+}
+
+.search-wrapper input {
+    border: none;
+    background: none;
+    flex: 1;
+    padding: 15px;
+    font-size: 16px;
+    outline: none;
+}
+
+/* Карточки */
+.promo-grid {
+    display: grid;
+    gap: 20px;
+    padding: 20px;
+}
+
+.promo-card {
+    background: var(--gray);
+    padding: 30px;
+    border-radius: 30px;
+    transition: 0.3s;
+}
+
+.promo-card:hover { transform: scale(1.02); }
+
+/* Бургер меню */
+.side-menu {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 280px;
+    height: 100%;
+    background: #fff;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.05);
+    z-index: 1000;
+    transition: 0.5s;
+    padding: 20px;
+}
+
+.side-menu.active { left: 0; }
+
+.side-menu ul { list-style: none; padding: 0; margin-top: 50px; }
+.side-menu li {
+    padding: 15px 0;
+    font-size: 18px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+
+.badge {
+    font-size: 10px;
+    background: #000;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+/* Оверлей загрузки */
+.full-screen-overlay {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #000;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Рекламные блоки */
+.ad-slot {
+    margin: 20px auto;
+    background: #fafafa;
+    border: 1px dashed #eee;
+    text-align: center;
+    border-radius: 15px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

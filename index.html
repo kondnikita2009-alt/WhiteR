@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhiteR — Твой образовательный AI-партнер</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="loader" class="full-screen-overlay">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <p id="loader-text">Загрузка WhiteR...</p>
+        </div>
+    </div>
+
+    <nav id="side-menu" class="side-menu">
+        <div class="menu-header">
+            <span class="close-menu">✕</span>
+        </div>
+        <ul>
+            <li onclick="showSection('home')">Главная</li>
+            <li onclick="showSection('community')">Комьюнити</li>
+            <li onclick="showSection('chat')">WhiteR AI <span class="badge">AI</span></li>
+            <li onclick="showSection('presentations')">Презентации <span class="badge">AI</span></li>
+            <li onclick="showSection('essays')">Курсовые <span class="badge">AI</span></li>
+            <li onclick="showSection('diplomas')">Дипломные <span class="badge">AI</span></li>
+            <li class="divider"></li>
+            <li onclick="showSection('projects')">Мои проекты</li>
+            <li id="auth-btn" onclick="openAuth()">Войти</li>
+        </ul>
+        <div class="ad-slot sidebar-ad">
+            <small>Реклама</small>
+        </div>
+    </nav>
+
+    <header>
+        <div class="burger-icon">☰</div>
+        <div class="logo">WhiteR <span class="ai-shimmer">AI</span></div>
+        <div class="user-profile" id="user-display">@</div>
+    </header>
+
+    <main id="main-content">
+        <section id="home-section" class="active-section">
+            <div class="hero">
+                <h2 class="fade-in">Будущее образования здесь.</h2>
+                <div class="search-wrapper fade-in">
+                    <input type="text" placeholder="Спроси WhiteR о курсовой или презентации..." id="main-search">
+                    <button id="search-trigger">➔</button>
+                </div>
+            </div>
+
+            <div class="promo-grid">
+                <div class="promo-card">
+                    <h3>Презентации</h3>
+                    <p>Генерация слайдов по одной теме. Минимум текста, максимум стиля.</p>
+                </div>
+                <div class="promo-card">
+                    <h3>Курсовые и Дипломы</h3>
+                    <p>Поиск источников и структурирование плана работы.</p>
+                </div>
+                <div class="promo-card">
+                    <h3>Студенческое комьюнити</h3>
+                    <p>Обменивайся опытом и готовыми проектами.</p>
+                </div>
+            </div>
+
+            <div class="ad-slot horizontal-ad">
+                <p style="color: #ccc;">Место для баннера A-Ads</p>
+            </div>
+        </section>
+
+        <section id="chat-section" class="hidden">
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-box">
+                    <div class="message ai">Привет! Я WhiteR AI. Чем помочь с учебой?</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" placeholder="Сообщение..." id="chat-input">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Вход</h3>
+            <input type="text" id="username" placeholder="@username">
+            <input type="number" id="pin" placeholder="PIN (6 цифр)" maxlength="6">
+            <div id="reg-fields" class="hidden">
+                <input type="tel" id="phone" placeholder="Номер телефона">
+            </div>
+            <button class="primary-btn" onclick="handleAuth()">Продолжить</button>
+            <p onclick="toggleAuthMode()" id="toggle-text">Нет аккаунта? Регистрация</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
