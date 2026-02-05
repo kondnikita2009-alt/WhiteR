@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>S.P. AI | Platform</title>
+    <style>
+        /* === СТИЛИ (CSS) === */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background: #F2F2F7; color: #1C1C1E; overflow-x: hidden; }
+
+        /* Контейнеры страниц */
+        .page { display: none; min-height: 100vh; }
+        .page.active { display: block; }
+
+        /* Дизайн карточек */
+        .card { background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); }
+
+        /* Страница Входа */
+        .auth-wrapper { padding: 40px 20px; max-width: 400px; margin: 0 auto; }
+        .header-text h1 { font-size: 34px; letter-spacing: -1px; margin-bottom: 10px; }
+        .header-text p { color: #8E8E93; margin-bottom: 30px; font-size: 17px; }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 600; color: #8E8E93; margin-bottom: 8px; text-transform: uppercase; }
+        input { width: 100%; padding: 16px; border-radius: 12px; border: none; background: #E5E5EA; font-size: 16px; outline: none; transition: 0.2s; }
+        input:focus { background: #fff; box-shadow: 0 0 0 3px rgba(0,122,255,0.2); }
+
+        .segmented-control { display: flex; background: #E5E5EA; padding: 2px; border-radius: 12px; position: relative; }
+        .segmented-control label { flex: 1; text-align: center; padding: 10px; z-index: 2; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .selection-indicator { position: absolute; width: 50%; height: calc(100% - 4px); background: #fff; border-radius: 10px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        #style-pan:checked ~ .selection-indicator { transform: translateX(100%); }
+        input[type="radio"] { display: none; }
+
+        .btn-primary { width: 100%; padding: 18px; background: #007AFF; color: #fff; border: none; border-radius: 30px; font-weight: 700; font-size: 17px; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn-primary:active { transform: scale(0.96); }
+        .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Dashboard */
+        .glass-header { position: sticky; top: 0; background: rgba(242,242,247,0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .user-info { display: flex; align-items: center; }
+        .avatar-mini { width: 36px; height: 36px; background: #000; color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 700; margin-right: 10px; }
+        
+        .coin-badge { background: #fff; padding: 6px 14px; border-radius: 20px; display: flex; align-items: center; gap: 6px; font-weight: 800; border: 1px solid rgba(0,0,0,0.05); cursor: pointer; }
+        .coin-icon { width: 16px; height: 16px; background: #FFD700; border-radius: 50%; border: 2px solid #FFA500; }
+
+        .ai-card { background: #007AFF; color: #fff; margin: 20px; display: flex; align-items: center; gap: 15px; }
+        .ai-orb { width: 45px; height: 45px; background: #fff; border-radius: 50%; box-shadow: 0 0 20px rgba(255,255,255,0.4); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+
+        .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px 100px 20px; }
+        .subject-card { text-align: center; }
+        .grade { display: inline-block; margin-top: 8px; background: #E5F1FF; color: #007AFF; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 800; }
+
+        /* Tab Bar */
+        .tab-bar { position: fixed; bottom: 25px; left: 20px; right: 20px; height: 65px; background: rgba(255,255,255,0.9); backdrop-filter: blur(15px); border-radius: 35px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.02); }
+        .tab-item { font-size: 24px; text-decoration: none; opacity: 0.3; transition: 0.3s; }
+        .ai-btn { width: 50px; height: 50px; background: #000; color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+
+    <div id="login-page" class="page active">
+        <main class="auth-wrapper">
+            <div class="header-text">
+                <h1>Witaj w przyszłości.</h1>
+                <p>Twój osobisty asystent edukacyjny.</p>
+            </div>
+
+            <div class="card">
+                <div class="input-group">
+                    <label>Twoje imię</label>
+                    <input type="text" id="regName" placeholder="Np. Ivan">
+                </div>
+
+                <div class="input-group">
+                    <label>Numer telefonu</label>
+                    <div style="display:flex; align-items:center; background:#E5E5EA; border-radius:12px; padding:0 12px;">
+                        <span style="font-weight:600; font-size:14px; margin-right:8px;">🇵🇱 +48</span>
+                        <input type="tel" id="regPhone" placeholder="000 000 000" maxlength="11" style="background:transparent; padding:16px 0;">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Styl komunikacji</label>
+                    <div class="segmented-control">
+                        <input type="radio" name="style" value="ty" id="style-ty" checked>
+                        <label for="style-ty">Na Ty</label>
+                        <input type="radio" name="style" value="pan" id="style-pan">
+                        <label for="style-pan">Oficjalnie</label>
+                        <div class="selection-indicator"></div>
+                    </div>
+                </div>
+
+                <button id="btn-submit" class="btn-primary" disabled>Zarejestruj się</button>
+            </div>
+            <p style="text-align:center; color:#8E8E93; margin-top:30px; font-size:13px; font-weight:500;">S.P. AI Systems © 2026</p>
+        </main>
+    </div>
+
+    <div id="board-page" class="page">
+        <header class="glass-header">
+            <div class="user-info">
+                <div class="avatar-mini" id="userAvatar">U</div>
+                <span id="display-name" style="font-weight:700;">Witaj!</span>
+            </div>
+            <div class="coin-badge" onclick="addCoin()">
+                <span id="balance-amount">5</span>
+                <div class="coin-icon"></div>
+            </div>
+        </header>
+
+        <div class="card ai-card">
+            <div class="ai-orb"></div>
+            <div>
+                <h2 id="ai-greeting" style="font-size:19px; font-weight:700;">Dzień dobry!</h2>
+                <p style="font-size:13px; opacity:0.9;">Masz 5 pytań AI na dzisiaj.</p>
+            </div>
+        </div>
+
+        <div class="bento-grid">
+            <div class="card subject-card">
+                <div style="font-size:32px; margin-bottom:8px;">∑</div>
+                <h3 style="font-size:15px;">Matematyka</h3>
+                <span class="grade">Średnia 5.0</span>
+            </div>
+            <div class="card subject-card">
+                <div style="font-size:32px; margin-bottom:8px;">Aa</div>
+                <h3 style="font-size:15px;">J. Polski</h3>
+                <span class="grade">Średnia 4+</span>
+            </div>
+            <div class="card" style="grid-column: span 2; background:#000; color:#fff; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h3 style="font-size:17px;">S.P. AI Chat</h3>
+                    <p style="font-size:12px; opacity:0.6;">Zadaj pytanie asystentowi</p>
+                </div>
+                <div style="font-size:26px;">✨</div>
+            </div>
+        </div>
+
+        <nav class="tab-bar">
+            <a href="#" class="tab-item" style="opacity:1;">🏠</a>
+            <a href="#" class="tab-item">📅</a>
+            <div class="ai-btn">S</div>
+            <a href="#" class="tab-item">📝</a>
+            <a href="#" class="tab-item" onclick="resetApp()">👤</a>
+        </nav>
+    </div>
+
+    <script>
+        /* === ЛОГИКА (JAVASCRIPT) === */
+        const Storage = {
+            save: (data) => localStorage.setItem('sp_user', JSON.stringify(data)),
+            get: () => JSON.parse(localStorage.getItem('sp_user')),
+            clear: () => localStorage.removeItem('sp_user')
+        };
+
+        const App = {
+            init() {
+                this.userData = Storage.get();
+                this.render();
+                this.bindEvents();
+            },
+
+            render() {
+                if (this.userData) {
+                    // Если залогинен — проверяем дату и показываем дашборд
+                    this.checkDailyReset();
+                    document.getElementById('login-page').classList.remove('active');
+                    document.getElementById('board-page').classList.add('active');
+                    
+                    document.getElementById('display-name').innerText = `Cześć, ${this.userData.name}`;
+                    document.getElementById('userAvatar').innerText = this.userData.name[0].toUpperCase();
+                    document.getElementById('balance-amount').innerText = this.userData.coins;
+                    document.getElementById('ai-greeting').innerText = this.userData.style === 'ty' 
+                        ? `W czym pomóc, ${this.userData.name}?` 
+                        : `W czym mogę pomóc?`;
+                } else {
+                    // Если нет — страница входа
+                    document.getElementById('board-page').classList.remove('active');
+                    document.getElementById('login-page').classList.add('active');
+                }
+            },
+
+            checkDailyReset() {
+                const today = new Date().toDateString();
+                if (this.userData.lastDate !== today) {
+                    this.userData.coins = 5;
+                    this.userData.lastDate = today;
+                    Storage.save(this.userData);
+                }
+            },
+
+            bindEvents() {
+                const nameInp = document.getElementById('regName');
+                const phoneInp = document.getElementById('regPhone');
+                const btn = document.getElementById('btn-submit');
+
+                const validate = () => {
+                    const isName = nameInp.value.trim().length >= 2;
+                    const isPhone = phoneInp.value.replace(/\s/g, '').length >= 9;
+                    btn.disabled = !(isName && isPhone);
+                };
+
+                nameInp.oninput = validate;
+                phoneInp.oninput = (e) => {
+                    let v = e.target.value.replace(/\D/g, '').substring(0, 9);
+                    if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+                    else if (v.length > 3) v = v.replace(/(\d{3})(\d{3})/, '$1 $2');
+                    e.target.value = v;
+                    validate();
+                };
+
+                btn.onclick = () => {
+                    const data = {
+                        name: nameInp.value,
+                        style: document.querySelector('input[name="style"]:checked').value,
+                        coins: 5,
+                        lastDate: new Date().toDateString()
+                    };
+                    Storage.save(data);
+                    this.userData = data;
+                    this.render();
+                };
+            }
+        };
+
+        // Функции для кнопок на Дашборде
+        window.addCoin = () => {
+            if(confirm("Obejrzeć reklamę za +1 monetę?")) {
+                let data = Storage.get();
+                data.coins++;
+                Storage.save(data);
+                document.getElementById('balance-amount').innerText = data.coins;
+            }
+        };
+
+        window.resetApp = () => {
+            if(confirm("Wylogować się и usunąć dane?")) {
+                Storage.clear();
+                location.reload();
+            }
+        };
+
+        // Запуск
+        document.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
+</body>
+</html>
+ 
