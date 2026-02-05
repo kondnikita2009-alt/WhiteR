@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>S.P. AI | Login</title>
+    <link rel="stylesheet" href="sp-style.css">
+</head>
+<body>
+    <div class="app-container">
+        <nav class="top-nav">
+            <div class="brand">S.P. AI</div>
+        </nav>
+
+        <main class="auth-wrapper">
+            <div class="header-text">
+                <h1>Witaj w przyszłości.</h1>
+                <p>Twój osobisty asystent edukacyjny.</p>
+            </div>
+
+            <div class="card auth-card">
+                <div class="input-group">
+                    <label>Twoje imię</label>
+                    <input type="text" id="regName" placeholder="Ivan">
+                </div>
+
+                <div class="input-group">
+                    <label>Numer telefonu</label>
+                    <div class="phone-wrapper" style="display:flex; align-items:center; background:#E5E5EA; border-radius:12px; padding:0 10px;">
+                        <span style="margin-right:8px;">🇵🇱 +48</span>
+                        <input type="tel" id="regPhone" placeholder="000 000 000" maxlength="11" style="background:transparent; border:none;">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Styl komunikacji</label>
+                    <div class="segmented-control">
+                        <input type="radio" name="style" value="ty" id="style-ty" checked>
+                        <label for="style-ty">Na Ty</label>
+                        <input type="radio" name="style" value="pan" id="style-pan">
+                        <label for="style-pan">Oficjalnie</label>
+                        <div class="selection-indicator"></div>
+                    </div>
+                </div>
+
+                <button id="btn-submit" class="btn-primary" disabled>Zarejestruj się</button>
+            </div>
+            <p style="text-align:center; color:#8E8E93; margin-top:20px; font-size:12px;">S.P. AI Systems © 2026</p>
+        </main>
+    </div>
+    <script src="sp-script.js"></script>
+</body>
+</html>
