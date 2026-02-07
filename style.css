@@ -1,0 +1,233 @@
+:root {
+    --primary: #8b5cf6; /* Магический фиолетовый */
+    --bg: #ffffff;
+    --text: #1f2937;
+    --transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+/* Preloader */
+#preloader {
+    position: fixed;
+    inset: 0;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeOut 0.5s forwards 2s;
+}
+
+.magic-text {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, #8b5cf6, #d946ef, #8b5cf6);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+    to { background-position: 200% center; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
+}
+
+/* Header */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Side Menu */
+#side-menu {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 300px;
+    height: 100%;
+    background: white;
+    box-shadow: 20px 0 50px rgba(0,0,0,0.05);
+    z-index: 200;
+    transition: var(--transition);
+    padding: 40px;
+}
+
+#side-menu.open {
+    left: 0;
+}
+
+#side-menu ul {
+    list-style: none;
+    margin-top: 50px;
+}
+
+#side-menu li {
+    font-size: 20px;
+    margin: 25px 0;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#side-menu li:hover {
+    color: var(--primary);
+    transform: translateX(10px);
+}
+
+/* Sections */
+.page {
+    display: none;
+    padding: 120px 20px 60px;
+    min-height: 100vh;
+}
+
+.page.active {
+    display: block;
+    animation: fadeIn 0.8s ease;
+}
+
+.hero {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 100px;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    padding: 40px;
+    border-radius: 20px;
+    background: #f9f9ff;
+    transition: 0.4s;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.1);
+}
+
+/* AI Overlay */
+.ai-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 300;
+}
+
+.ai-window {
+    width: 90%;
+    max-width: 500px;
+    height: 600px;
+    background: white;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+}
+
+.ai-header {
+    padding: 20px;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.ai-input-area {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid #eee;
+}
+
+.ai-input-area input {
+    flex: 1;
+    border: none;
+    background: #f0f0f0;
+    padding: 12px 20px;
+    border-radius: 20px;
+    outline: none;
+}
+
+/* Step Circles */
+.steps-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 400px;
+    margin: 40px auto;
+}
+
+.step {
+    padding: 15px;
+    border: 2px solid #eee;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: 0.3s;
+}
+
+.step span {
+    width: 30px;
+    height: 30px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
