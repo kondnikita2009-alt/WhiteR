@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StudyBox — Образовательная Экосистема</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 1. GLOBAL THEME & TYPOGRAPHY --- */
+        :root {
+            /* Colors */
+            --bg-body: #ffffff;
+            --bg-surface: #f8f9fc;
+            
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --text-tertiary: #9CA3AF;
+            
+            --primary-gradient: linear-gradient(135deg, #7F00FF 0%, #E100FF 100%);
+            --primary-color: #7F00FF;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-blur: blur(20px);
+            
+            /* Shadows & Effects */
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(127, 0, 255, 0.15);
+            --glow: 0 0 20px rgba(127, 0, 255, 0.4);
+            
+            /* Animation Curves */
+            --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        /* Магический текст (Градиент) */
+        .text-gradient {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        /* --- 2. LOADING SCREEN (SPLASH) --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .splash-logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            opacity: 0;
+            transform: scale(0.9);
+            animation: splashEntry 2s var(--ease-smooth) forwards;
+        }
+
+        @keyframes splashEntry {
+            0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+            50% { opacity: 1; transform: scale(1); }
+            80% { opacity: 1; transform: scale(1); filter: blur(0px); }
+            100% { opacity: 0; transform: scale(1.1); filter: blur(10px); }
+        }
+
+        /* --- 3. HEADER & NAV --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.0);
+            backdrop-filter: blur(0px);
+        }
+
+        header.scrolled {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .burger-btn {
+            position: absolute;
+            left: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .burger-btn:hover { background: rgba(0,0,0,0.05); }
+
+        .burger-line {
+            width: 20px;
+            height: 2px;
+            background: var(--text-primary);
+            border-radius: 2px;
+            transition: all 0.4s var(--ease-elastic);
+        }
+
+        /* Burger Active State */
+        .burger-btn.active .burger-line:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); width: 22px; }
+        .burger-btn.active .burger-line:nth-child(2) { transform: scale(0); }
+        .burger-btn.active .burger-line:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); width: 22px; }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        /* Fullscreen Menu */
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--bg-body);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+            transition: all 0.5s var(--ease-smooth);
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1);
+        }
+
+        .nav-link {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-tertiary); /* Inactive color */
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-link.current {
+            color: var(--text-primary);
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color);
+            transform: translateX(10px);
+        }
+
+        /* --- 4. MAIN LAYOUT --- */
+        main {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        section {
+            display: none; /* Скрываем все секции, JS будет включать */
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section.active {
+            display: block;
+        }
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- HOME SECTION DESIGN --- */
+        .hero-container {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .badge-new {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(127, 0, 255, 0.1);
+            color: var(--primary-color);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            border: 1px solid rgba(127, 0, 255, 0.2);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            margin-bottom: 24px;
+        }
+        
+        @media(max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 48px auto;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .info-card {
+            background: #fff;
+            padding: 32px;
+            border-radius: 24px;
+            text-align: left;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .info-card:hover::before { opacity: 1; }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--bg-surface);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .card-title { font-size: 1.25rem; margin-bottom: 12px; }
+        .card-text { color: var(--text-secondary); font-size: 0.95rem; }
+
+        /* --- SOLUTIONS WIZARD DESIGN --- */
+        .wizard-wrapper {
+            background: #fff;
+            border-radius: 30px;
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+            margin-top: 20px;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .progress-bar {
+            display: flex;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .progress-line {
+            position: absolute;
+            top: 50%; left: 0; width: 100%; height: 2px;
+            background: #eee; z-index: 1;
+            transform: translateY(-50%);
+        }
+        .progress-fill {
+            position: absolute;
+            top: 50%; left: 0; height: 2px;
+            background: var(--primary-color); z-index: 1;
+            transform: translateY(-50%);
+            width: 0%; /* JS will animate this */
+            transition: width 0.4s ease;
+        }
+        .step-node {
+            width: 40px; height: 40px;
+            background: #fff;
+            border: 2px solid #eee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            font-weight: 600;
+            color: #ccc;
+            margin: 0 auto; /* Распределение через flex */
+            transition: all 0.3s;
+        }
+        .progress-bar div { flex: 1; text-align: center; }
+        
+        .step-node.active {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(127, 0, 255, 0.2);
+        }
+        .step-node.completed {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Form Inputs Styling */
+        .modern-select, .modern-input {
+            width: 100%;
+            padding: 18px 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            color: var(--text-primary);
+            background: var(--bg-surface);
+            border: 1px solid transparent;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            appearance: none; /* Убирает стандартную стрелку */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234B5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 16px;
+        }
+        
+        .modern-input { background-image: none; } /* Убираем стрелку для input */
+
+        .modern-select:focus, .modern-input:focus {
+            outline: none;
+            background: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(127, 0, 255, 0.1);
+        }
+
+        .btn-magic {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px -5px rgba(127, 0, 255, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-magic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px rgba(127, 0, 255, 0.5);
+        }
+        .btn-magic:active { transform: scale(0.98); }
+
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <h1 class="splash-logo text-gradient">StudyBox</h1>
+    </div>
+
+    <header id="app-header">
+        <div class="burger-btn" onclick="toggleMenu()">
+            <span class="burger-line"></span>
+            <span class="burger-line"></span>
+            <span class="burger-line"></span>
+        </div>
+        <div class="logo brand-font text-gradient">StudyBox</div>
+    </header>
+
+    <div class="nav-overlay" id="nav-overlay">
+        <a class="nav-link current" onclick="navigateTo('home')">Главная</a>
+        <a class="nav-link" onclick="navigateTo('solutions')">Решения</a>
+        <a class="nav-link" style="color: var(--primary-color);" onclick="openAI()">StudyBox AI ✨</a>
+    </div>
+
+    <main>
+        <section id="home" class="active">
+            <div class="hero-container">
+                <div class="fade-in-element">
+                    <span class="badge-new">Версия 2.0 (Beta)</span>
+                    <h2 class="hero-title">Умное образование <br><span class="text-gradient">без границ</span></h2>
+                    <p class="hero-desc">
+                        StudyBox — это не просто ГДЗ. Это экосистема, которая учит понимать материал. Видеоразборы, пошаговые алгоритмы и AI-репетитор в одном месте.
+                    </p>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="info-card fade-in-element" style="transition-delay: 0.1s;">
+                        <div class="card-icon">🎓</div>
+                        <h3 class="card-title">Честное обучение</h3>
+                        <p class="card-text">Мы скрываем ответ до тех пор, пока ты не посмотришь объяснение. Главная цель — научить.</p>
+                    </div>
+                    <div class="info-card fade-in-element" style="transition-delay: 0.2s;">
+                        <div class="card-icon">⚡</div>
+                        <h3 class="card-title">Мгновенный AI</h3>
+                        <p class="card-text">Встроенная нейросеть анализирует задачу по фото и объясняет логику решения.</p>
+                    </div>
+                    <div class="info-card fade-in-element" style="transition-delay: 0.3s;">
+                        <div class="card-icon">📹</div>
+                        <h3 class="card-title">Видеоформат</h3>
+                        <p class="card-text">Профессиональные преподаватели записывают разборы для сложных задач из учебников.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="solutions">
+            <div class="hero-container">
+                <h2 class="hero-title">Поиск <span class="text-gradient">Решения</span></h2>
+                
+                <div class="wizard-wrapper">
+                    <div class="progress-bar">
+                        <div class="progress-line"></div>
+                        <div class="progress-fill" id="progress-fill"></div>
+                        <div><div class="step-node active" id="node-1">1</div></div>
+                        <div><div class="step-node" id="node-2">2</div></div>
+                        <div><div class="step-node" id="node-3">3</div></div>
+                        <div><div class="step-node" id="node-4">4</div></div>
+                    </div>
+
+                    <div id="wizard-step-1" class="wizard-step">
+                        <h3 style="margin-bottom: 20px;">Выберите класс обучения</h3>
+                        <select class="modern-select" id="select-class" onchange="wizNext(1)">
+                            <option value="" disabled selected>Укажите класс</option>
+                            <option value="9">9 Класс</option>
+                            <option value="10">10 Класс</option>
+                            <option value="11">11 Класс</option>
+                        </select>
+                    </div>
+                    
+                    <div id="wizard-dynamic-container"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <div class="ai-sheet-overlay" id="ai-overlay" onclick="closeAI()"></div>
+    <div class="ai-sheet" id="ai-sheet">
+        <div class="ai-sheet-header">
+            <div class="ai-drag-handle"></div>
+            <div class="ai-header-content">
+                <div class="ai-avatar">✨</div>
+                <div>
+                    <h3 class="brand-font" style="font-size: 1.1rem;">StudyBox AI</h3>
+                    <p style="font-size: 0.75rem; color: #10b981;">• Онлайн | Твой умный репетитор</p>
+                </div>
+                <button class="ai-close-btn" onclick="closeAI()">×</button>
+            </div>
+        </div>
+
+        <div class="ai-chat-body" id="ai-chat-body">
+            <div class="chat-welcome">
+                <div class="magic-loader"></div>
+                <h4>Магия загрузки...</h4>
+                <p>Анализирую твои прошлые вопросы и готовлюсь помогать!</p>
+            </div>
+        </div>
+
+        <div class="ai-chat-footer">
+            <div class="ai-input-wrapper">
+                <textarea id="ai-input" placeholder="Спроси о чем угодно..." rows="1"></textarea>
+                <button id="ai-send-btn" onclick="sendAIMessage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <section id="admin">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h2 class="brand-font">Панель управления <span class="text-gradient">v2.0</span></h2>
+                <button class="btn-logout" onclick="logout()">Выйти</button>
+            </div>
+
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h3>Конструктор блоков</h3>
+                    <div class="admin-control-item">
+                        <span>Заголовок Hero</span>
+                        <input type="text" id="conf-hero-title" class="modern-input" value="Умное образование без границ">
+                    </div>
+                    <div class="admin-control-item">
+                        <span>Основной градиент (CSS)</span>
+                        <input type="text" id="conf-gradient" class="modern-input" value="linear-gradient(135deg, #7F00FF 0%, #E100FF 100%)">
+                    </div>
+                    <button class="btn-magic" style="padding: 12px;" onclick="saveConfig()">Сохранить изменения</button>
+                </div>
+
+                <div class="admin-card">
+                    <h3>База решений (ГДЗ)</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 15px;">Добавляйте новые ссылки на видео и задачи</p>
+                    <button class="btn-magic" style="background: var(--text-primary); padding: 12px;">+ Добавить задачу</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="admin-login-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 class="brand-font" style="margin-bottom: 20px;">Вход для куратора</h3>
+            <input type="password" id="admin-pass-input" class="modern-input" placeholder="Введите ключ доступа">
+            <div id="login-error" style="color: #ef4444; font-size: 0.8rem; margin-bottom: 10px; display: none;">Доступ запрещен!</div>
+            <button class="btn-magic" onclick="tryLogin()">Войти в систему</button>
+            <button class="btn-text" onclick="navigateTo('home')" style="margin-top: 10px; width: 100%; opacity: 0.6;">Назад</button>
+        </div>
+    </div>
+
+    <style>
+        /* --- AI SHEET STYLES --- */
+        .ai-sheet {
+            position: fixed;
+            bottom: -100%; /* Hidden by default */
+            left: 0;
+            width: 100%;
+            height: 92vh;
+            background: #fff;
+            z-index: 2000;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+            transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ai-sheet.active {
+            transform: translateY(-100%);
+        }
+
+        .ai-sheet-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+        }
+        .ai-sheet-overlay.active { opacity: 1; pointer-events: all; }
+
+        .ai-sheet-header {
+            padding: 15px 20px 25px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .ai-drag-handle {
+            width: 40px; height: 5px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            margin: 0 auto 15px auto;
+        }
+
+        .ai-header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ai-avatar {
+            width: 45px; height: 45px;
+            background: var(--primary-gradient);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--glow);
+        }
+
+        .ai-close-btn {
+            margin-left: auto;
+            background: #f3f4f6;
+            border: none;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* Чат и сообщения */
+        .ai-chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #fcfcfd;
+        }
+
+        .chat-welcome {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-secondary);
+        }
+
+        .magic-loader {
+            width: 50px; height: 50px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .ai-chat-footer {
+            padding: 20px;
+            background: #fff;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 40px; /* Для айфонов */
+        }
+
+        .ai-input-wrapper {
+            background: #f3f4f6;
+            border-radius: 20px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        #ai-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 10px 0;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            max-height: 150px;
+        }
+
+        #ai-send-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 40px; height: 40px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        /* --- ADMIN PANEL STYLES --- */
+        .admin-container { padding-top: 20px; }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .admin-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .admin-card h3 { margin-bottom: 20px; font-size: 1.1rem; }
+
+        .admin-control-item { margin-bottom: 15px; }
+        .admin-control-item span {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Модалка входа */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 400px;
+            background: #fff;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        /* Анимации появления */
+        .fade-in-element {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+        .fade-in-element.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+    <script>
+        // --- СОСТОЯНИЕ ПРИЛОЖЕНИЯ ---
+        const AppState = {
+            currentSection: 'home',
+            isAdmin: false,
+            chatHistory: JSON.parse(localStorage.getItem('studybox_chat')) || [],
+            config: JSON.parse(localStorage.getItem('studybox_config')) || {
+                heroTitle: "Умное образование без границ",
+                gradient: "linear-gradient(135deg, #7F00FF 0%, #E100FF 100%)"
+            }
+        };
+
+        // --- ИНИЦИАЛИЗАЦИЯ ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Применяем сохраненные настройки админки
+            applyConfig();
+            
+            // Скрываем Splash через 2.5 сек
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    checkScroll(); // Запуск анимаций появления
+                }, 800);
+            }, 2500);
+        });
+
+        // --- НАВИГАЦИЯ ---
+        function navigateTo(sectionId) {
+            if (sectionId === 'admin' && !AppState.isAdmin) {
+                document.getElementById('admin-login-modal').style.display = 'flex';
+                return;
+            }
+
+            // Убираем старое
+            document.querySelectorAll('section').forEach(s => {
+                s.classList.remove('active', 'visible');
+            });
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('current'));
+
+            // Включаем новое
+            const target = document.getElementById(sectionId);
+            target.classList.add('active');
+            setTimeout(() => target.classList.add('visible'), 50);
+            
+            AppState.currentSection = sectionId;
+            toggleMenu(false); // Закрыть меню если открыто
+            window.scrollTo(0,0);
+        }
+
+        function toggleMenu(force) {
+            const nav = document.getElementById('nav-overlay');
+            const burger = document.querySelector('.burger-btn');
+            const isActive = force !== undefined ? force : !nav.classList.contains('active');
+            
+            nav.classList.toggle('active', isActive);
+            burger.classList.toggle('active', isActive);
+        }
+
+        // --- МАГИЧЕСКИЙ AI ЧАТ ---
+        function openAI() {
+            toggleMenu(false);
+            const sheet = document.getElementById('ai-sheet');
+            const overlay = document.getElementById('ai-overlay');
+            
+            sheet.classList.add('active');
+            overlay.classList.add('active');
+            
+            // "Магическая" загрузка истории
+            const body = document.getElementById('ai-chat-body');
+            if (AppState.chatHistory.length === 0) {
+                setTimeout(() => {
+                    body.innerHTML = `
+                        <div class="ai-msg" style="background:#f3f4f6; padding:15px; border-radius:18px; align-self:flex-start; max-width:80%;">
+                            Привет! Я твой AI-помощник StudyBox. Могу объяснить теорему, решить задачу или просто поболтать. О чем думаешь?
+                        </div>
+                    `;
+                }, 1500);
+            } else {
+                renderHistory();
+            }
+        }
+
+        function closeAI() {
+            document.getElementById('ai-sheet').classList.remove('active');
+            document.getElementById('ai-overlay').classList.remove('active');
+        }
+
+        function sendAIMessage() {
+            const input = document.getElementById('ai-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const body = document.getElementById('ai-chat-body');
+            
+            // Сообщение пользователя
+            const userDiv = document.createElement('div');
+            userDiv.style = "background: var(--primary-gradient); color:white; padding:15px; border-radius:18px; align-self:flex-end; max-width:80%;";
+            userDiv.textContent = text;
+            body.appendChild(userDiv);
+            
+            input.value = '';
+            body.scrollTop = body.scrollHeight;
+
+            // Имитация ответа нейросети
+            setTimeout(() => {
+                const aiDiv = document.createElement('div');
+                aiDiv.style = "background:#f3f4f6; padding:15px; border-radius:18px; align-self:flex-start; max-width:80%; border-left: 4px solid var(--primary-color);";
+                aiDiv.innerHTML = "<b>StudyBox AI:</b> Хороший вопрос! Чтобы решить это, нам нужно применить базовую логику... (здесь будет API ответ)";
+                body.appendChild(aiDiv);
+                body.scrollTop = body.scrollHeight;
+                
+                // Сохраняем в историю
+                AppState.chatHistory.push({role: 'user', text: text}, {role: 'ai', text: aiDiv.innerHTML});
+                localStorage.setItem('studybox_chat', JSON.stringify(AppState.chatHistory));
+            }, 1000);
+        }
+
+        // --- ЛОГИКА АДМИНКИ (ИСПРАВЛЕНИЕ ACCESS DENIED) ---
+        function tryLogin() {
+            const pass = document.getElementById('admin-pass-input').value;
+            const error = document.getElementById('login-error');
+            
+            // Пароль: admin2026 (можешь поменять здесь)
+            if (pass === 'admin2026') {
+                AppState.isAdmin = true;
+                document.getElementById('admin-login-modal').style.display = 'none';
+                navigateTo('admin');
+                error.style.display = 'none';
+            } else {
+                error.style.display = 'block';
+                error.textContent = "Неверный ключ доступа!";
+                // Визуальная встряска при ошибке
+                const modal = document.querySelector('.modal-content');
+                modal.style.animation = 'shake 0.4s';
+                setTimeout(() => modal.style.animation = '', 400);
+            }
+        }
+
+        function logout() {
+            AppState.isAdmin = false;
+            navigateTo('home');
+        }
+
+        function saveConfig() {
+            const newTitle = document.getElementById('conf-hero-title').value;
+            const newGrad = document.getElementById('conf-gradient').value;
+            
+            AppState.config.heroTitle = newTitle;
+            AppState.config.gradient = newGrad;
+            
+            localStorage.setItem('studybox_config', JSON.stringify(AppState.config));
+            applyConfig();
+            alert("Настройки успешно применены!");
+        }
+
+        function applyConfig() {
+            // Применяем заголовок
+            document.querySelector('.hero-title').innerHTML = AppState.config.heroTitle.replace("без границ", `<span class="text-gradient">без границ</span>`);
+            // Применяем градиенты через CSS переменные
+            document.documentElement.style.setProperty('--primary-gradient', AppState.config.gradient);
+        }
+
+        // --- СКРОЛЛ ЭФФЕКТЫ ---
+        window.addEventListener('scroll', checkScroll);
+        function checkScroll() {
+            const header = document.getElementById('app-header');
+            if (window.scrollY > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+
+            // Анимация появления элементов при скролле
+            const elements = document.querySelectorAll('.fade-in-element');
+            elements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 50) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        // --- ВИЗАРД (РЕШЕНИЯ) ---
+        function wizNext(step) {
+            const fill = document.getElementById('progress-fill');
+            fill.style.width = (step * 33.3) + '%';
+            document.getElementById('node-' + (step + 1)).classList.add('active');
+            
+            if(step === 1) {
+                const val = document.getElementById('select-class').value;
+                document.getElementById('wizard-dynamic-container').innerHTML = `
+                    <h3 style="margin-bottom: 20px;">Выбран ${val} класс. Какой предмет?</h3>
+                    <select class="modern-select" id="select-subject" onchange="wizNext(2)">
+                        <option value="" disabled selected>Выберите предмет</option>
+                        <option value="math">Математика</option>
+                        <option value="phys">Физика</option>
+                        <option value="chem">Химия</option>
+                    </select>
+                `;
+            }
+        }
+    </script>
+
+    <style>
+        /* Дополнительная анимация ошибки */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</body>
+</html>
