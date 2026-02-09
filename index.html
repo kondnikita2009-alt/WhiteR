@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyBox — Образовательный портал будущего</title>
+    <style>
+        /* --- 1. CORE VARIABLES & RESET --- */
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #1a1a1a;
+            --text-light: #666;
+            --accent-start: #8e2de2;
+            --accent-end: #4a00e0;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --shadow: 0 10px 30px rgba(74, 0, 224, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            opacity: 0; /* For initial fade in */
+            transition: opacity 0.5s ease;
+        }
+
+        body.loaded {
+            opacity: 1;
+        }
+
+        /* --- 2. MAGIC TEXT & ANIMATIONS --- */
+        .magic-text {
+            background: linear-gradient(45deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient-shift 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- 3. LOADING SCREEN --- */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        #loader h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        /* --- 4. HEADER & NAV --- */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: center; /* Title centered */
+            align-items: center;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .burger {
+            position: absolute;
+            left: 20px;
+            cursor: pointer;
+            width: 30px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 1002;
+        }
+
+        .burger span {
+            display: block;
+            height: 2px;
+            width: 100%;
+            background: var(--text-main);
+            border-radius: 2px;
+            transition: all 0.4s ease;
+        }
+
+        /* Burger Animation */
+        .burger.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .burger.active span:nth-child(2) { opacity: 0; }
+        .burger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -7px); }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            transform: translateY(-100%);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 1001;
+        }
+
+        .nav-menu.active {
+            transform: translateY(0);
+        }
+
+        .nav-item {
+            font-size: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-main);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(45deg, var(--accent-start), var(--accent-end));
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after { width: 100%; }
+
+        /* --- 5. MAIN CONTENT SECTIONS --- */
+        .page-section {
+            display: none;
+            padding-top: 100px;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .page-section.active {
+            display: block;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* HOME STYLES */
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 100px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--accent-start), var(--accent-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* SOLUTIONS STYLES */
+        .wizard-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #eee;
+            z-index: 0;
+        }
+
+        .step-dot {
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 2px solid #eee;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            font-weight: bold;
+            color: #ccc;
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            border-color: var(--accent-start);
+            color: var(--accent-start);
+            box-shadow: 0 0 10px rgba(142, 45, 226, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateX(20px);
+            display: none;
+            transition: all 0.5s ease;
+        }
+
+        .form-group.active {
+            opacity: 1;
+            transform: translateX(0);
+            display: block;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--accent-start);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--accent-start), var(--accent-end));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary:active { transform: scale(0.98); }
+
+        .solution-loader {
+            text-align: center;
+            display: none;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(142, 45, 226, 0.1);
+            border-left-color: var(--accent-start);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- 6. AI CHAT OVERLAY --- */
+        #ai-overlay {
+            position: fixed;
+            bottom: -100%;
+            right: 0;
+            width: 100%;
+            height: 100%; /* Full screen on mobile, styled differently on desktop */
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 2000;
+            transition: bottom 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 768px) {
+            #ai-overlay {
+                width: 400px;
+                height: 600px;
+                bottom: -700px;
+                right: 20px;
+                border-radius: 20px;
+                box-shadow: var(--shadow);
+                border: 1px solid rgba(0,0,0,0.05);
+            }
+            #ai-overlay.active {
+                bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            #ai-overlay.active {
+                bottom: 0;
+            }
+            /* Make header specific for AI mobile */
+            .ai-header {
+                border-radius: 0;
+            }
+        }
+
+        .ai-header {
+            padding: 20px;
+            background: linear-gradient(45deg, var(--accent-start), var(--accent-end));
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .close-ai {
+            cursor: pointer;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            color: white;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #fdfdfd;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            animation: msgPop 0.3s ease;
+        }
+
+        @keyframes msgPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .bot-msg {
+            background: #f0f0f0;
+            color: #333;
+            border-bottom-left-radius: 2px;
+        }
+
+        .user-msg {
+            background: linear-gradient(45deg, var(--accent-start), var(--accent-end));
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .chat-input-area {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            background: white;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .attach-btn, .send-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--accent-start);
+            transition: transform 0.2s;
+        }
+        .attach-btn:hover, .send-btn:hover { transform: scale(1.1); }
+
+        /* --- 7. ADMIN PANEL --- */
+        .admin-trigger {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            opacity: 0.05;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #admin-panel-ui {
+            display: none;
+        }
+
+        .admin-dashboard {
+            background: #f4f4f4;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .admin-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <h1 class="magic-text">StudyBox</h1>
+    </div>
+
+    <header>
+        <div class="burger" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="header-title magic-text">StudyBox</div>
+    </header>
+
+    <nav class="nav-menu" id="navMenu">
+        <a class="nav-item" onclick="navigateTo('home')">Главная</a>
+        <a class="nav-item" onclick="navigateTo('solutions')">Решения</a>
+        <a class="nav-item" onclick="toggleAI()">StudyBox AI</a>
+    </nav>
+
+    <section id="home" class="page-section active">
+        <div class="hero fade-in-up">
+            <h2 class="magic-text">Магия Понимания</h2>
+            <p>Мы создали StudyBox не для того, чтобы ты просто списал домашку. Мы здесь, чтобы ты понял, как работает мир. Образовательный портал нового поколения.</p>
+        </div>
+
+        <div class="feature-grid">
+            <div class="feature-card fade-in-up">
+                <div class="feature-icon">▶</div>
+                <h3>Видеоразборы</h3>
+                <p>Подробные видео-объяснения к сложным задачам. Как будто учитель объясняет лично тебе.</p>
+            </div>
+            <div class="feature-card fade-in-up">
+                <div class="feature-icon">✨</div>
+                <h3>Умные решения</h3>
+                <p>Пошаговые алгоритмы решения. Мы показываем путь к ответу, а не просто результат.</p>
+            </div>
+            <div class="feature-card fade-in-up">
+                <div class="feature-icon">🤖</div>
+                <h3>StudyBox AI</h3>
+                <p>Искусственный интеллект, который объяснит любую тему и найдет ошибку в твоем решении.</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px;" class="fade-in-up">
+            <p style="font-size: 0.9rem; color: #999;">
+                * Сайт находится в активной разработке. Новые функции и магия добавляются ежедневно.
+            </p>
+        </div>
+    </section>
+
+    <section id="solutions" class="page-section">
+        <h2 style="text-align: center; margin-bottom: 40px;" class="magic-text">Поиск Решения</h2>
+        
+        <div class="wizard-container">
+            <div class="step-indicator">
+                <div class="step-dot active" id="dot-1">1</div>
+                <div class="step-dot" id="dot-2">2</div>
+                <div class="step-dot" id="dot-3">3</div>
+                <div class="step-dot" id="dot-4">4</div>
+            </div>
+
+            <div class="form-group active" id="step-1">
+                <label style="display:block; margin-bottom:10px; font-weight:600;">Выберите класс</label>
+                <select id="class-select" onchange="nextStep(1)">
+                    <option value="" disabled selected>Класс...</option>
+                    <option value="9">9 Класс</option>
+                    <option value="10">10 Класс</option>
+                    <option value="11">11 Класс</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="step-2">
+                <label style="display:block; margin-bottom:10px; font-weight:600;">Выберите предмет</label>
+                <select id="subject-select" onchange="nextStep(2)">
+                    <option value="" disabled selected>Предмет...</option>
+                    </select>
+                <button class="btn-primary" style="margin-top: 20px; background: #ccc;" onclick="resetWizard()">Назад</button>
+            </div>
+
+            <div class="form-group" id="step-3">
+                <label style="display:block; margin-bottom:10px; font-weight:600;">Выберите учебник</label>
+                <select id="book-select" onchange="nextStep(3)">
+                    <option value="" disabled selected>Издание...</option>
+                    </select>
+            </div>
+
+            <div class="form-group" id="step-4">
+                <label style="display:block; margin-bottom:10px; font-weight:600;">Выберите задание</label>
+                <input type="number" id="task-input" placeholder="Номер задания (например, 125)">
+                <button class="btn-primary" onclick="showSolution()">Найти решение</button>
+            </div>
+
+            <div class="solution-loader" id="solution-result">
+                <div class="spinner"></div>
+                <p>Магия вычислений...</p>
+            </div>
+            
+            <div id="final-answer" style="display:none; margin-top:20px; padding:20px; background:#f0f0f0; border-radius:10px;">
+                <h3 style="color:var(--accent-start)">Решение:</h3>
+                <p>Здесь будет отображено подробное решение задания <span id="res-task-num"></span>.</p>
+                <p style="font-size:0.8rem; color:#888; margin-top:10px;">(В данный момент база данных наполняется администратором)</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="ai-overlay">
+        <div class="ai-header">
+            <div>StudyBox AI ✨</div>
+            <button class="close-ai" onclick="toggleAI()">✕</button>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="message bot-msg">Привет! Я StudyBox AI. Отправь мне фото задачи или напиши условие, и я помогу тебе разобраться.</div>
+        </div>
+        <div class="chat-input-area">
+            <button class="attach-btn">📷</button>
+            <input type="text" class="chat-input" placeholder="Спроси что-нибудь..." id="ai-input">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <div class="admin-trigger" onclick="openAdminLogin()">Admin</div>
+
+    <div class="modal" id="admin-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px;">Secret Access</h3>
+            <input type="password" id="admin-pass" placeholder="Secret Password" style="margin-bottom: 15px;">
+            <button class="btn-primary" onclick="verifyAdmin()">Войти</button>
+            <p id="auth-error" style="color: red; font-size: 0.8rem; margin-top: 10px; display: none;">Access Denied</p>
+        </div>
+    </div>
+
+    <div id="admin-panel-ui">
+        <div class="admin-dashboard">
+            <div class="admin-header">
+                <h2>Panel Administrator</h2>
+                <button onclick="location.reload()" style="padding: 5px 10px; background: #333; color: white; border:none; border-radius: 5px;">Exit</button>
+            </div>
+            <div class="admin-card">
+                <h3>Добавить учебник</h3>
+                <input type="text" placeholder="Название учебника" style="margin-top: 10px;">
+                <select style="margin-top: 10px;">
+                    <option>Алгебра</option>
+                    <option>Геометрия</option>
+                    <option>Физика</option>
+                </select>
+                <button class="btn-primary">Сохранить</button>
+            </div>
+            <div class="admin-card">
+                <h3>Управление Решениями</h3>
+                <p>Активных решений в базе: 0</p>
+                <p>Статус сервера: <span style="color:green">Active</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- 1. INITIALIZATION & LOADER --- */
+        window.addEventListener('load', () => {
+            // Keep loader for 2 seconds as requested
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                document.getElementById('loader').style.visibility = 'hidden';
+                document.body.classList.add('loaded');
+                
+                // Trigger scroll animations for home page initially
+                triggerScrollAnimations();
+            }, 2000);
+        });
+
+        /* --- 2. NAVIGATION --- */
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            const burger = document.querySelector('.burger');
+            menu.classList.toggle('active');
+            burger.classList.toggle('active');
+        }
+
+        function navigateTo(sectionId) {
+            // Hide menu
+            document.getElementById('navMenu').classList.remove('active');
+            document.querySelector('.burger').classList.remove('active');
+
+            // Switch sections
+            document.querySelectorAll('.page-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            // Reset specific components if needed
+            if(sectionId === 'home') triggerScrollAnimations();
+        }
+
+        function toggleAI() {
+            // Close menu if open
+            document.getElementById('navMenu').classList.remove('active');
+            document.querySelector('.burger').classList.remove('active');
+            
+            const ai = document.getElementById('ai-overlay');
+            ai.classList.toggle('active');
+        }
+
+        /* --- 3. SCROLL ANIMATIONS --- */
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        function triggerScrollAnimations() {
+            document.querySelectorAll('.fade-in-up').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        /* --- 4. SOLUTIONS WIZARD LOGIC --- */
+        // Mock Data
+        const db = {
+            '9': {
+                'Алгебра': ['Макарычев 2023', 'Мерзляк 2022'],
+                'Геометрия': ['Атанасян 2021']
+            },
+            '10': { 'Физика': ['Мякишев 2020'] },
+            '11': { 'Химия': ['Габриелян 2021'] }
+        };
+
+        function nextStep(currentStep) {
+            const next = currentStep + 1;
+            
+            // Logic to populate next dropdown based on selection
+            if(currentStep === 1) {
+                const classVal = document.getElementById('class-select').value;
+                const subjectSelect = document.getElementById('subject-select');
+                subjectSelect.innerHTML = '<option value="" disabled selected>Предмет...</option>';
+                
+                if(db[classVal]) {
+                    Object.keys(db[classVal]).forEach(subj => {
+                        subjectSelect.innerHTML += `<option value="${subj}">${subj}</option>`;
+                    });
+                    activateStep(2);
+                }
+            }
+            else if(currentStep === 2) {
+                const classVal = document.getElementById('class-select').value;
+                const subjVal = document.getElementById('subject-select').value;
+                const bookSelect = document.getElementById('book-select');
+                bookSelect.innerHTML = '<option value="" disabled selected>Издание...</option>';
+
+                if(db[classVal][subjVal]) {
+                    db[classVal][subjVal].forEach(book => {
+                        bookSelect.innerHTML += `<option value="${book}">${book}</option>`;
+                    });
+                    activateStep(3);
+                }
+            }
+            else if(currentStep === 3) {
+                activateStep(4);
+            }
+        }
+
+        function activateStep(stepNum) {
+            // Hide all subsequent steps first (basic logic)
+            // Show target step
+            document.querySelectorAll('.form-group').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${stepNum}`).classList.add('active');
+
+            // Update dots
+            for(let i=1; i<=4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if(i <= stepNum) dot.classList.add('active');
+                else dot.classList.remove('active');
+            }
+        }
+
+        function resetWizard() {
+            document.getElementById('class-select').selectedIndex = 0;
+            activateStep(1);
+            document.getElementById('final-answer').style.display = 'none';
+            document.getElementById('solution-result').style.display = 'none';
+        }
+
+        function showSolution() {
+            const task = document.getElementById('task-input').value;
+            if(!task) return;
+
+            document.getElementById('step-4').style.display = 'none';
+            document.getElementById('solution-result').style.display = 'block';
+
+            // Simulate loading
+            setTimeout(() => {
+                document.getElementById('solution-result').style.display = 'none';
+                document.getElementById('final-answer').style.display = 'block';
+                document.getElementById('res-task-num').innerText = task;
+                document.getElementById('step-4').style.display = 'block'; // Bring back input if they want another
+            }, 1500);
+        }
+
+        /* --- 5. AI CHAT --- */
+        function sendMessage() {
+            const input = document.getElementById('ai-input');
+            const text = input.value;
+            if(!text) return;
+
+            const chatBody = document.getElementById('chat-body');
+            
+            // User Msg
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user-msg';
+            userDiv.innerText = text;
+            chatBody.appendChild(userDiv);
+            
+            input.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // Bot Reply Simulation
+            setTimeout(() => {
+                const botDiv = document.createElement('div');
+                botDiv.className = 'message bot-msg';
+                botDiv.innerText = "Я анализирую твой запрос... В настоящий момент я работаю в демо-режиме, но скоро я смогу решать интегралы!";
+                chatBody.appendChild(botDiv);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 1000);
+        }
+
+        /* --- 6. SECURITY & ADMIN PANEL --- */
+        
+        function openAdminLogin() {
+            document.getElementById('admin-modal').classList.add('active');
+        }
+
+        // Close modal if clicked outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('admin-modal');
+            if (event.target == modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        async function verifyAdmin() {
+            const inputPass = document.getElementById('admin-pass').value;
+            const errorMsg = document.getElementById('auth-error');
+            
+            // True Hash for '984322Nik' (SHA-256)
+            // Pre-calculated to avoid storing plain text in code
+            // '984322Nik' -> SHA-256
+            const trueHash = "19a2856241b72a5a542b477610427c366432b04f76784d528b6a378d3878b277";
+
+            const buffer = new TextEncoder().encode(inputPass);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            if (hashHex === trueHash) {
+                // Success
+                document.body.innerHTML = document.getElementById('admin-panel-ui').innerHTML;
+                document.body.style.opacity = 1;
+                document.body.style.overflow = 'auto';
+            } else {
+                // Fail
+                errorMsg.style.display = 'block';
+                document.getElementById('admin-pass').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
